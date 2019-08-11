@@ -77,6 +77,10 @@
             $convertedTimestamps[] = ['start' => $start, 'end' => $end];
         }
 
+        usort($convertedTimestamps, function($a, $b) {
+            return $a['start'] - $b['start'];
+        });
+
         return generateCommand($filename, $convertedTimestamps, $output);
     }
 
