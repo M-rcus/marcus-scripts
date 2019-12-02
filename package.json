@@ -1,0 +1,23 @@
+{
+  "name": "marcus-scripts",
+  "version": "1.0.0",
+  "description": "Random scripts",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M-rcus/marcus-scripts.git"
+  },
+  "author": "Marcus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/M-rcus/marcus-scripts/issues"
+  },
+  "homepage": "https://github.com/M-rcus/marcus-scripts#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "signale": "^1.4.0"
+  }
+}
