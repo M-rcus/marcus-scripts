@@ -40,7 +40,7 @@ signale.config({
 
         if (data.success)
         {
-            signale.info(`Successfully created album - ID: ${data.id}`);
+            signale.info(`Successfully created album with name: ${body.name} - ID: ${data.id}`);
             albumIds.push(data.id);
             continue;
         }
