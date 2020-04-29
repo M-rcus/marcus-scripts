@@ -2,9 +2,9 @@
 
 RANDOM_NAME="$(date '+%Y-%m-%d')_$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)";
 # URL prefix (will be used for clipboard copy)
-URL_PREFIX="https://i.titty.stream/f";
+URL_PREFIX="https://i.titty.stream/ss";
 # Connection alias (media), bucket (public), folder/path inside bucket (ss - optional)
-BUCKET_PATH="media/public/f";
+BUCKET_PATH="media/public/ss";
 # Location for mc (Minio CLI)
 MC_PATH="/usr/bin/mc";
 
