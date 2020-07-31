@@ -2,7 +2,7 @@
 
 RANDOM_NAME="$(date '+%Y-%m-%d')_$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)";
 # URL prefix (will be used for clipboard copy)
-URL_PREFIX="https://i.titty.stream/ss";
+URL_PREFIX="https://i.marcus.pw/ss";
 # Connection alias (media), bucket (public), folder/path inside bucket (ss - optional)
 BUCKET_PATH="media/public/ss";
 # Location for mc (Minio CLI)
@@ -29,7 +29,7 @@ $MC_PATH cp $1 "$BUCKET_PATH/$OUTPUT_FILE";
 FILE_URL="$URL_PREFIX/$OUTPUT_FILE";
 
 echo $FILE_URL;
-echo $FILE_URL | xclip -selection clipboard;
+echo -n $FILE_URL | xclip -selection clipboard;
 
 if [[ $DESKTOP_NOTIFY_ENABLE -eq 1 ]]; then
     notify-send -t $NOTIFY_TIMEOUT -u low -i $NOTIFY_ICON_PATH "File uploaded and URL copied to clipboard:" $FILE_URL;
