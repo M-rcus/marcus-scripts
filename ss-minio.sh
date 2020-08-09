@@ -12,7 +12,7 @@
 # Generate random name
 SS_FILENAME="$(date '+%Y-%m-%d')_$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1).png";
 # URL prefix (will be used for clipboard copy)
-URL_PREFIX="https://i.titty.stream/ss";
+URL_PREFIX="https://i.marcus.pw/ss";
 # Connection alias (media), bucket (public), folder/path inside bucket (ss - optional)
 BUCKET_PATH="media/public/ss";
 # Location for mc (Minio CLI)
@@ -27,7 +27,7 @@ NOTIFY_ICON_PATH="$HOME/Pictures/Apps/Camera_cropped.png";
 NOTIFY_TIMEOUT=2500;
 
 # Copy input to bucket
-$MC_PATH cp $1 "$BUCKET_PATH/$SS_FILENAME";
+$MC_PATH cp "$1" "$BUCKET_PATH/$SS_FILENAME";
 
 # Format URL and copy to clipboard
 SS_URL="$URL_PREFIX/$SS_FILENAME";
