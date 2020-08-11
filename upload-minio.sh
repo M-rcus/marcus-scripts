@@ -23,7 +23,7 @@ INPUT_EXT="${INPUT_BASE##*.}"
 OUTPUT_FILE="${RANDOM_NAME}.${INPUT_EXT}";
 
 # Copy input to bucket
-$MC_PATH cp "$1" "$BUCKET_PATH/$OUTPUT_FILE";
+$MC_PATH cp "${INPUT_FILE}" "$BUCKET_PATH/$OUTPUT_FILE";
 
 # Format URL and copy to clipboard
 FILE_URL="$URL_PREFIX/$OUTPUT_FILE";
