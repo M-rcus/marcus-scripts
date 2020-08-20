@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FOLDER_NAME="$@";
+FOLDER_NAME=$(basename -- "$@");
 
 if [[ -z "${FOLDER_NAME}" ]]; then
     echo "Please specify folder name.";
