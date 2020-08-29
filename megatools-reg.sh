@@ -27,7 +27,7 @@ read FULL_NAME;
 
 VERIFY_CMD="$(megatools reg --scripted --register --email "${EMAIL}" --password "${PASSWORD}" --name "${FULL_NAME}")";
 # Replace `@LINK@` with an empty string, so the eval further down actually fucking works :rolling_eyes:
-VERIFY_CMD=`sed -n 's/@LINK@//g' ${VERIFY_CMD}`;
+VERIFY_CMD=`sed -n 's/@LINK@//g' -- ${VERIFY_CMD}`;
 
 echo "Verification link?"
 read VERIFY_LINK;
