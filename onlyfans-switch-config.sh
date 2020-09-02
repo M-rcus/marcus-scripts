@@ -65,8 +65,8 @@ fi
 if [[ -f "${CONFIG_AUTO}" ]]; then
     echo "Current config (old): Manual ripping";
     echo "Moving current config to ${CONFIG_MANUAL}";
-    mv $CONFIG_CURRENT $CONFIG_MANUAL;
-    mv $CONFIG_AUTO $CONFIG_CURRENT;
+    mv "${CONFIG_CURRENT}" "${CONFIG_MANUAL}";
+    mv "${CONFIG_AUTO}" "${CONFIG_CURRENT}";
     echo "Current config (new): Automatic ripping";
 elif [[ -f "${CONFIG_MANUAL}" ]]; then
     # Here we assume the opposite, that since the manual config file
@@ -74,8 +74,8 @@ elif [[ -f "${CONFIG_MANUAL}" ]]; then
     # But again it's just a switcharoo.
     echo "Current config (old): Automatic ripping";
     echo "Moving current config to ${CONFIG_AUTO}";
-    mv $CONFIG_CURRENT $CONFIG_AUTO;
-    mv $CONFIG_MANUAL $CONFIG_CURRENT;
+    mv "${CONFIG_CURRENT}" "${CONFIG_AUTO}";
+    mv "${CONFIG_MANUAL}" "${CONFIG_CURRENT}";
     echo "Current config (new): Manual ripping";
 else
     # Neither config file could be found, so we basically don't know wtf to do.
