@@ -7,14 +7,17 @@ if [[ -z "${FOLDER_NAME}" ]]; then
     exit 0
 fi
 
-megatools mkdir "/Root/${FOLDER_NAME}";
+MEGA_FOLDER="/Root/${FOLDER_NAME}";
+
+echo "Creating remote folder: ${MEGA_FOLDER}";
+megatools mkdir "${MEGA_FOLDER}";
 
 echo "Run copy command? [y/N]"
 read RUN_COPY
 
 RUN_COPY=${RUN_COPY,,}
 if [[ $RUN_COPY == *"y"* ]]; then
-    megatools copy --remote "/Root/${FOLDER_NAME}" --local "${FOLDER_NAME}";
+    megatools copy --remote "${MEGA_FOLDER}" --local "${FOLDER_NAME}";
 else
     exit 0
 fi
