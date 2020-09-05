@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('./config/imgfrog');
+const config = require('./config/lolisafe');
 const signale = require('signale');
 
 const token = config.TOKEN;
