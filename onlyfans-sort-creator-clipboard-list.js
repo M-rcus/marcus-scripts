@@ -16,7 +16,7 @@ if (!input) {
 
 const list = input
              // Replace the beginning part
-             .replace('Names: Username = username | 0 = All ')
+             .replace(/^.+0 = All/g, '')
              // 'Split' the string into a newline-based list
              .replace(reg, '\n')
              // Trim the list (remove leading/trailing whitespace)
