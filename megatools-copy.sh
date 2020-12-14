@@ -11,7 +11,7 @@ fi
 # Print out the account email address used
 MEGA_CONFIG="$HOME/.megarc";
 if [[ -f "${MEGA_CONFIG}" ]]; then
-    MEGA_USERNAME=`sed -n 's/^Password = \(.*\)/\1/p' < ${MEGA_CONFIG}`;
+    MEGA_USERNAME=`sed -n 's/^Username = \(.*\)/\1/p' < ${MEGA_CONFIG}`;
     echo "Using account: ${MEGA_USERNAME}";
 fi
 
