@@ -10,6 +10,13 @@ fi
 
 MEGA_FOLDER="/Root/${FOLDER_NAME}";
 
+# Print out the account email address used
+MEGA_CONFIG="$HOME/.megarc";
+if [[ -f "${MEGA_CONFIG}" ]]; then
+    MEGA_USERNAME=`sed -n 's/^Password = \(.*\)/\1/p' < ${MEGA_CONFIG}`;
+    echo "Using account: ${MEGA_USERNAME}";
+fi
+
 echo "Creating remote folder: ${MEGA_FOLDER}";
 megatools mkdir "${MEGA_FOLDER}";
 

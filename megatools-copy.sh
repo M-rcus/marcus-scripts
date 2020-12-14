@@ -8,6 +8,13 @@ if [[ -z "${FOLDER_NAME}" ]]; then
     exit 0
 fi
 
+# Print out the account email address used
+MEGA_CONFIG="$HOME/.megarc";
+if [[ -f "${MEGA_CONFIG}" ]]; then
+    MEGA_USERNAME=`sed -n 's/^Password = \(.*\)/\1/p' < ${MEGA_CONFIG}`;
+    echo "Using account: ${MEGA_USERNAME}";
+fi
+
 MEGA_FOLDER="/Root/${FOLDER_NAME}";
 echo "Remote: ${MEGA_FOLDER}";
 echo "Local: ${FULL_PATH}";
