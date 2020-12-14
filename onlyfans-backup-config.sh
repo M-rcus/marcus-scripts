@@ -9,7 +9,7 @@ OF_SETTINGS="$OF_PROJECT_DIR/.settings";
 
 # Some of these files are extra files that normally aren't used with the project
 # See `onlyfans-switch-config.sh`
-FILES=( "config.json" "config.auto.json" "extra_auth.json" "old_auth.json" "test.json" );
+FILES=( "config.json" "config.auto.json" "extra_auth.json" "old_auth.json" );
 # Date format: YEAR-MONTH-DAY_HOUR-MINUTE-SECOND
 CURRENT_DT="$(date +"%Y-%m-%d_%H-%M-%S")";
 
