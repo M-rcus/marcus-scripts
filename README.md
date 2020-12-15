@@ -2,9 +2,7 @@
 
 My personal scripts for random tools.
 
-Some of these scripts are used via CLI, others are used via a webpage.
-
-Public scripts are hosted at [marcus.pw/scripts](https://marcus.pw/scripts/).
+Some of these scripts are used via CLI, others are used via a webpage (currently only one: `ffmpeg-volume-mute.php`).
 
 ## CLI scripts
 
@@ -20,8 +18,8 @@ Run `npm install` in the project directory to install the required dependencies
 ### PHP
 
 As of right now PHP scripts don't have dependencies (besides `php` itself).  
-If they ever do, make sure to install [composer](https://getcomposer.org/) and run `composer install` in the project directory.  
-If you're unsure: If there's a `composer.json` file in the project directory, get composer and run the command.
+If they ever do, make sure to install [Composer](https://getcomposer.org/) and run `composer install` in the project directory.  
+If you're unsure: If there's a `composer.json` file in the project directory, get Composer and run the command. Unless `composer.json` exists at all in this project, Composer won't be necessary.
 
 ## What da script do
 
