@@ -1,9 +1,15 @@
 #!/bin/bash
 
+# Requirements:
+# - `curl`
+# - `jq`
+
 # Base URL for Lolisafe instance.
 # Resulting URLs will be something like: ${BASE_URL}/api/albums
 # For example: https://cyberdrop.me/api/albums
-BASE_URL="https://cyberdrop.me";
+# BASE_URL="https://cyberdrop.me";
+# Alternatively use an environment variable (like I do).
+BASE_URL="${CYBERDROP_URL}";
 UPLOAD_FOLDER="$(realpath "$@")";
 
 if [[ ! -d "${UPLOAD_FOLDER}" ]]; then
@@ -79,7 +85,14 @@ else
     ALBUM_NAME="$(echo "${ALBUM_INFO}" | jq -r '.name')";
     # Extract the album slug used for the URL.
     ALBUM_SLUG="$(echo "${ALBUM_INFO}" | jq -r '.identifier')";
+    # Extract the `homeDomain` that CyberDrop uses, but may not be available on other Lolisafe instances.
+    HOME_URL="$(echo "${GET_ALBUMS}" | jq -r '.homeDomain')";
+
+    # Fallback to base URL if `homeDomain` is not set.
+    if [[ "${HOME_URL}" == "" ]]; then
+        HOME_URL="${BASE_URL}";
+    fi
 
     echo "Upload complete for album: ${ALBUM_NAME}";
-    echo "Album URL: ${BASE_URL}/a/${ALBUM_SLUG}";
+    echo "Album URL: ${HOME_URL}/a/${ALBUM_SLUG}";
 fi

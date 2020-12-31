@@ -26,7 +26,7 @@ If you're unsure: If there's a `composer.json` file in the project directory, ge
 ### ffmpeg-volume-mute.php
 
 Generates an `ffmpeg` command where you can manually mute parts of a video.  
-This is meant to be a webpage and you can see a live version here: https://marcus.pw/scripts/ffmpeg-volume-mute
+This is meant to be a webpage, not a CLI script.
 
 ### lolisafe-create-albums.js
 
