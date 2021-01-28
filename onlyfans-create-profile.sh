@@ -21,7 +21,7 @@ TODAY="$(date +"%Y-%m-%d")";
 TEMPLATE='{"auth": {}}';
 # There isn't a nice way to store multi-line & indented strings in a Bash variable.
 # So here we are... piping it into `jq`. Totally necessary.
-TEMPLATE="$(echo "${TEMPLATE}" | jq)";
+TEMPLATE="$(echo "${TEMPLATE}" | jq .)";
 
 echo "Name? - Used in the folder name after the date";
 read FOLDER_NAME;
