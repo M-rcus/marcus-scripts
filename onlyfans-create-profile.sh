@@ -34,3 +34,11 @@ fi
 
 mkdir -p "${PROFILE_DIR}";
 echo "${TEMPLATE}" > "${PROFILE_DIR}/auth.json";
+
+# Check & open Sublime Text if it's installed
+HAS_SUBLIME="$(which subl)";
+if [[ $? -eq 0 ]]; then
+    subl "${PROFILE_DIR}/auth.json";
+else
+    echo "Cannot find \`subl\` - Skipping editing of file";
+fi
