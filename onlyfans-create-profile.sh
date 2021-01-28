@@ -36,9 +36,11 @@ mkdir -p "${PROFILE_DIR}";
 echo "${TEMPLATE}" > "${PROFILE_DIR}/auth.json";
 
 # Check & open Sublime Text if it's installed
+# fallback to `nano` instead.
+# `nano` is installed on all of my personal systems, can't speak for everyone else...
 HAS_SUBLIME="$(which subl)";
 if [[ $? -eq 0 ]]; then
     subl "${PROFILE_DIR}/auth.json";
 else
-    echo "Cannot find \`subl\` - Skipping editing of file";
+    nano "${PROFILE_DIR}/auth.json";
 fi
