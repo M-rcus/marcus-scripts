@@ -64,6 +64,42 @@ for (const name in regs)
     text = text.replace(params.regex, params.replace);
 }
 
+/**
+ * Special handling for 'QUOTE' bbcode
+ */
+let inQuote = false;
+const lines = text.split('\n');
+for (const lineIdx in lines)
+{
+    let line = lines[lineIdx];
+    const lower = line.toLowerCase();
+    if (!inQuote && !lower.includes('[quote')) {
+        continue;
+    }
+
+    inQuote = true;
+
+    /**
+     * Add quote arrows where applicable.
+     *
+     * First we need to remove the BBCode
+     * Then all following lines also need to have quote arrows
+     */
+    line = line.replace(/^\[quote(=[\w]+\]?)/i, '');
+    line = line.replace(/^/, '> ');
+    line = line.replace(/\[\/quote\]/i, '');
+    lines[lineIdx] = line;
+
+    /**
+     * This is the end of the quote, so we stop quoting.
+     */
+    if (lower.includes('[/quote]')) {
+        inQuote = false;
+    }
+}
+
+text = lines.join('\n');
+
 console.log(text);
 clipboardy.writeSync(text);
 console.log('Written to clipboard.');
