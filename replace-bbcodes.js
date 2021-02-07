@@ -85,7 +85,7 @@ for (const lineIdx in lines)
      * First we need to remove the BBCode
      * Then all following lines also need to have quote arrows
      */
-    line = line.replace(/^\[quote(=[\w]+\]?)/i, '');
+    line = line.replace(/^\[quote(=[\w\s]+\]?)/i, '');
     line = line.replace(/^/, '> ');
     line = line.replace(/\[\/quote\]/i, '');
     lines[lineIdx] = line;
