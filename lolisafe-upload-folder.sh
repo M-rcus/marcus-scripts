@@ -52,7 +52,7 @@ IFS=$'\n';
 for file in $FILES;
 do
     file="$(basename -- "$file")";
-    POST_FILE="$(curl -fsSL -H "token: ${TOKEN}" -H "albumid: ${ALBUM_ID}" -F files[]="@${file}" "${UPLOAD_FILE_URL}")"
+    POST_FILE="$(curl -fsSL -H "token: ${TOKEN}" -H "albumid: ${ALBUM_ID}" -F files[]=@\"${file}\" "${UPLOAD_FILE_URL}")"
     STATUS="$(echo "${POST_FILE}" | jq '.success')";
 
     if [[ "${STATUS}" == "false" ]]; then
