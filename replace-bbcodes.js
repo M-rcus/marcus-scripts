@@ -17,6 +17,14 @@ const regs = {
         regex: /\[\*\]/g,
         replace: '- ',
     },
+    icode: {
+        regex: /\[\/?\ICODE\]/gi,
+        replace: '`',
+    },
+    code: {
+        regex: /\[\/?\CODE\]/gi,
+        replace: '```',
+    },
     url: {
         regex: /\[URL='(.*)'](.*)\[\/URL\]/g,
         replace: '$2: <$1>',
@@ -38,7 +46,7 @@ const removeMatches = input.match(regs.remove.regex);
 const urlsMatches = input.match(regs.url.regex);
 
 if ((!removeMatches || !urlsMatches) || removeMatches.length < 1 && urlsMatches.length < 1) {
-    console.log('Could not find any valid BBCodes in clipboard.');
+    console.error('Could not find any valid BBCodes in clipboard.');
     process.exit(0);
 }
 
