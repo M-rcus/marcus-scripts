@@ -47,7 +47,6 @@ const urlsMatches = input.match(regs.url.regex);
 
 if ((!removeMatches || !urlsMatches) || removeMatches.length < 1 && urlsMatches.length < 1) {
     console.error('Could not find any valid BBCodes in clipboard.');
-    process.exit(0);
 }
 
 /**
