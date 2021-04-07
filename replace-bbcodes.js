@@ -46,7 +46,7 @@ const removeMatches = input.match(regs.remove.regex);
 const urlsMatches = input.match(regs.url.regex);
 
 if ((!removeMatches || !urlsMatches) || removeMatches.length < 1 && urlsMatches.length < 1) {
-    console.error('Could not find any valid BBCodes in clipboard.');
+    console.error('Initial checks could not find any valid BBCodes in clipboard. Script may not do anything.');
 }
 
 /**
@@ -70,6 +70,17 @@ for (const name in regs)
     const params = regs[name];
     text = text.replace(params.regex, params.replace);
 }
+
+/**
+ * Replace template text no one cares about.
+ */
+text = text.replace(/^Download links:/m, '');
+text = text.replace(/^I highly recommend an.+$/m, '');
+
+/**
+ * Replace excessive newlines with a maximum of two.
+ */
+text = text.replace(/\n{2,}/g, "\n\n");
 
 /**
  * Special handling for 'QUOTE' bbcode
