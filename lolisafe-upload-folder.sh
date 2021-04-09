@@ -65,9 +65,32 @@ do
     echo "File ${file} upload to URL: ${FINAL_URL}";
 done
 
+# Check if there's a ZIP file named the same as the folder name
+# If so, attempt to upload this after uploading all the other files.
+# TODO: Move file uploading to its own function, so it's less copy/paste.
+ZIP_FILE="../${ALBUM_NAME}.zip";
+if test -f "${ZIP_FILE}"; then
+    echo "ZIP file detected. Attempting to upload: ${ZIP_FILE}";
+
+    file="${ZIP_FILE}";
+    POST_FILE="$(curl -fsSL -H "token: ${TOKEN}" -H "albumid: ${ALBUM_ID}" -F files[]=@\"${file}\" "${UPLOAD_FILE_URL}")"
+    STATUS="$(echo "${POST_FILE}" | jq '.success')";
+
+    if [[ "${STATUS}" == "false" ]]; then
+        echo "Unable to upload file: ${file}";
+        echo "${POST_FILE}" | jq;
+        continue;
+    fi
+
+    FINAL_URL="$(echo "${POST_FILE}" | jq -r '.files[].url')";
+    echo "File ${file} upload to URL: ${FINAL_URL}";
+else
+    echo "ZIP file not found: ${ZIP_FILE}";
+    echo "No attempt to upload ZIP file will be made.";
+fi
+
 IFS="$OIFS";
 cd "${OLD_DIR}";
-
 
 echo "Retrieving album list from API and attempting to extract album information.";
 # Generate a timestamp that should hopefully bypass the API cache, if any?
