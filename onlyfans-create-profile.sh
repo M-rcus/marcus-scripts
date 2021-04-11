@@ -17,11 +17,6 @@ OF_PROJECT_DIR="${HOME}/projects/OnlyFans";
 OF_PROFILES="${OF_PROJECT_DIR}/.profiles/OnlyFans";
 
 TODAY="$(date +"%Y-%m-%d")";
-# The idea here is that you use the OnlyFans-Cookie-Helper to paste the `auth` object anyways: https://github.com/M-rcus/OnlyFans-Cookie-Helper
-TEMPLATE='{"auth": {}}';
-# There isn't a nice way to store multi-line & indented strings in a Bash variable.
-# So here we are... piping it into `jq`. Totally necessary.
-TEMPLATE="$(echo "${TEMPLATE}" | jq .)";
 
 echo "Name? - Used in the folder name after the date";
 read FOLDER_NAME;
@@ -33,7 +28,7 @@ if [[ -d "${PROFILE_DIR}" ]]; then
 fi
 
 mkdir -p "${PROFILE_DIR}";
-echo "${TEMPLATE}" > "${PROFILE_DIR}/auth.json";
+touch "${PROFILE_DIR}/auth.json";
 
 # Check & open Sublime Text if it's installed
 # fallback to `nano` instead.
