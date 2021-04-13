@@ -42,10 +42,10 @@ if [[ -z "$@" ]]; then
     exit 0
 fi
 
-which curl jq xargs > /dev/null;
+which curl jq parallel > /dev/null;
 DEP_RESULT=$?;
 if [[ $DEP_RESULT -ne 0 ]]; then
-    echo "curl, jq or xargs are missing. Please verify that they are all installed.";
+    echo "curl, jq or parallel are missing. Please verify that they are all installed.";
     exit $DEP_RESULT;
 fi
 
