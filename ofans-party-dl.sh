@@ -10,7 +10,7 @@
 usage()
 {
 cat << EOF
-usage: $0 -p NUM [space_separated_creators]
+usage: $0 [space_separated_creators]
 
 Downloads posts from creators on ofans.party
 
@@ -30,7 +30,7 @@ Keep in mind that metadata.json will be overwritten every time you run the scrip
 
 OPTIONS:
     -p        How many \`NUM\` post downloads to run in parallel (default: 2).
-    -o        Output directory. Default is `pwd`/ofans
+    -o        Output directory. Default is: `pwd`/ofans
     -h        Show this message
     -d        Dump metadata for creator as JSON
 EOF
@@ -54,7 +54,7 @@ PARALLEL_DL=2;
 DUMP_METADATA=0;
 OUTPUT_DIR="$(pwd)/ofans";
 
-while getopts ":h:p:d:" opt; do
+while getopts "hdp:o:" opt; do
     case $opt in
         h)
             usage
@@ -62,12 +62,14 @@ while getopts ":h:p:d:" opt; do
             ;;
         p)
             PARALLEL_DL=$OPTARG;
+            echo "Parallel downloads: ${PARALLEL_DL}";
             ;;
         d)
             DUMP_METADATA=1;
             ;;
         o)
             OUTPUT_DIR="${OPTARG}";
+            echo "Output directory specified: ${OUTPUT_DIR}";
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -83,16 +85,19 @@ done
 # You can override the IPFS URL by setting it as an environment variable
 # before running the script.
 # 
-# We fall back to the one used by ofans.party though.
+# We fall back to the Cloudflare one, but I'm not sure if it's the most ideal...
 if [[ -z "${OFANS_IPFS_URL}" ]]; then
-    OFANS_IPFS_URL="https://ipfs.greyh.at/ipfs";
+    OFANS_IPFS_URL="https://cloudflare-ipfs.com/ipfs";
 fi
 
 # Shorter variable name
 IPFS="${OFANS_IPFS_URL}";
 
+# Get rid of command flags from input params
+shift $((OPTIND - 1));
+
 CREATORS=$@;
-DL_DIR="$(pwd)";
+DL_DIR=$OUTPUT_DIR;
 for creator in $CREATORS;
 do
     echo "Fetching OnlyFans posts for creator: ${creator}";
@@ -104,10 +109,7 @@ do
         continue;
     fi
 
-    if [[ $DUMP_METADATA -eq 1 ]]; then
-        echo "-d specified. Dumping metadata.";
-    fi
-
+    CREATOR_DATA="$(jq -r . <<< "${FETCH_CREATOR}")";
     POSTS="$(jq -r '.response.posts' <<< "${FETCH_CREATOR}")";
     POST_COUNT="$(jq -r 'length' <<< "${POSTS}")";
 
@@ -131,6 +133,12 @@ do
         fi
     fi
 
+    # Metadata
+    if [[ $DUMP_METADATA -eq 1 ]]; then
+        echo "${CREATOR_DATA}" > "${CREATOR_DIR}/metadata.json";
+        echo "[Metadata] Saved to: ${CREATOR_DIR}/metadata.json";
+    fi
+
     # Attempt to create temp file to
     # store the cURL commands in for the creator.
     TMP_PREFIX="ofans_${creator}.XXXXXXX";
@@ -144,30 +152,31 @@ do
 
     # Thanks homie: https://unix.stackexchange.com/a/477218
     # Process each post
-    for pIdx in $(jq 'keys | .[]' <<< "${POSTS}"); do
+    for pIdx in $(jq -r 'keys | .[]' <<< "${POSTS}"); do
         POST="$(jq ".[${pIdx}]" <<< "${POSTS}")";
 
         POST_ID="$(jq -r '.post_id' <<< "${POST}")";
         POST_DATE="$(jq -r '.of_create_date' <<< "${POST}")";
 
         # Fall back to `create_date` if `of_create_date` is not defined.
-        if [[ -z "${POST_DATE}" ]]; then
+        if [[ "${POST_DATE}" == "null" ]]; then
             POST_DATE="$(jq -r '.create_date' <<< "${POST}")";
         fi
 
         FILE_DATE="$(date --date="${POST_DATE}" +"%Y-%m-%d")";
 
         # Process each media file
-        MEDIAS="$(jq '.media' <<< "${POST}")";
-        for mIdx in $(jq 'keys | .[]' <<< "${MEDIAS}"); do
-            MEDIA="$(jq -r ".[${mIDx}]" <<< "${MEDIAS}")";
+        MEDIAS="$(jq -r '.media' <<< "${POST}")";
+        for mIdx in $(jq -r 'keys | .[]' <<< "${MEDIAS}"); do
+            # Extract values we want to use
+            MEDIA="$(jq -r ".[${mIdx}]" <<< "${MEDIAS}")";
             MEDIA_ID="$(jq -r '.of_media_id' <<< "${MEDIA}")";
-            TYPE="$(jq -r '.type' <<< "${MEDIA}")"
+            TYPE="$(jq -r '.type' <<< "${MEDIA}")";
 
             # File extensions are best guesses
             # Based on my own experience videos uploaded to OnlyFans ALWAYS get
             # converted to MP4s (H264) and photos are ALWAYS JPGs.
-            EXTENSION="";
+            EXTENSION='';
             if [[ "${TYPE}" == "photo" ]]; then
                 EXTENSION=".jpg";
             elif [[ "${TYPE}" == "video" ]]; then
@@ -176,11 +185,24 @@ do
 
             IPFS_HASH="$(jq -r '.ipfs_media_hash' <<< "${MEDIA}")";
             FILE_NAME="${POST_ID}_${FILE_DATE}_${MEDIA_ID}${EXTENSION}";
-            CMD="curl -Lo '${FILE_NAME}' ${IPFS}/${IPFS_HASH}";
 
+            # Alright, I know this is ghetto, but I figured it was the easiest
+            # way after parsing the JSON by calling jq 9 billion times
+            # Bash wasn't exactly the right tool for this, but whatever.
+            CMD="curl -fLo '${CREATOR_DIR}/${FILE_NAME}' ${IPFS}/${IPFS_HASH}";
             echo "${CMD}" >> "${TMP_FILE}";
         done
+
+        echo "[Processing] Processed post ID ${POST_ID} from creator: ${creator}";
     done
 
-    echo "Finished processing creator: ${creator}";
+    echo "[Processing] Finished processing creator: ${creator}";
+
+    echo "[Downloading] Medias from creator: ${creator}";
+    echo "[Downloading] Downloads in parallel: ${PARALLEL_DL}";
+    echo "[Info] Please keep in mind that since the files are hosted using IPFS (https://ipfs.io/), they may take a long time to download. Please be patient.";
+
+    parallel -j $PARALLEL_DL < "${TMP_FILE}";
+
+    echo "[Downloading] Downloads complete for: ${creator}";
 done
