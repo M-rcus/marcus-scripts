@@ -28,6 +28,10 @@ If metadata is requested (\`-d\`), it will be written as a JSON dump under:
     [output-directory]/[creator-name]/metadata.json
 Keep in mind that metadata.json will be overwritten every time you run the script for said creator.
 
+ENVIRONMENT VARIABLES:
+    Certain options need to be set via environment variables (at least for the time being):
+        - \`OFANS_IPFS_URL\` - The IPFS gateway used for downloading the files (default: https://cloudflare-ipfs.com/ipfs).
+
 OPTIONS:
     -p        How many \`NUM\` post downloads to run in parallel (default: 2).
     -o        Output directory. Default is: `pwd`/ofans
