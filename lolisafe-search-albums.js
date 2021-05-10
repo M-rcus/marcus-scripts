@@ -77,8 +77,10 @@ const cli = meow(`
     /**
      * Yoinked from the create albums script.
      */
-    const format = config.searchPrintFormat || config.printFormat;
+    const printFormat = config.searchPrintFormat || config.printFormat;
+    const copyFormat = config.searchCopyFormat;
     const printList = [];
+    const copyList = [];
     for (const album of albums)
     {
         const {name, id, description, files} = album;
@@ -92,19 +94,23 @@ const cli = meow(`
             slug,
         };
         
-        let albumFormat = format;
+        let albumPrintFormat = printFormat;
+        let albumCopyFormat = copyFormat;
         for (const key in templates)
         {
             const reg = new RegExp(`{${key}}`, 'g');
-            albumFormat = albumFormat.replace(reg, templates[key]);
+            albumPrintFormat = albumPrintFormat.replace(reg, templates[key]);
+            albumCopyFormat = albumCopyFormat.replace(reg, templates[key]);
         }
 
-        printList.push(albumFormat);
+        printList.push(albumPrintFormat);
+        copyList.push(albumCopyFormat);
     }
 
-    const text = printList.join('\n');
-    console.log(text);
+    const print = printList.join('\n');
+    console.log(print);
 
-    await clipboardy.write(text);
+    const copyText = copyList.join('\n');
+    await clipboardy.write(copyText);
     console.log('Written to clipboard.');
 })();

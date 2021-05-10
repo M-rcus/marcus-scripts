@@ -40,7 +40,10 @@ module.exports = {
 
     /**
      * Similar to `printFormat`, except for the search albums script.
-     * @type {String}
+     *
+     * `searchCopyFormat` is the format used for copying a list of albums to the clipboard.
+     * `searchPrintFormat` is the format used for printing the list to console.
      */
-    searchPrintFormat: '{base_url}/a/{slug}',
+    searchCopyFormat: '{base_url}/a/{slug}',
+    searchPrintFormat: '- {name}: {base_url}/a/{slug}',
 };
