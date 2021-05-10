@@ -19,6 +19,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "clipboardy": "^2.3.0",
+    "meow": "^10.0.0",
     "signale": "^1.4.0"
   }
 }
