@@ -37,4 +37,10 @@ module.exports = {
      * - {files} (number of files)
      */
     printFormat: '- [{name}]({base_url}/a/{slug})',
+
+    /**
+     * Similar to `printFormat`, except for the search albums script.
+     * @type {String}
+     */
+    searchPrintFormat: '{base_url}/a/{slug}',
 };
