@@ -64,7 +64,6 @@ if [[ -z "${GOFILE_ACCESS_TOKEN}" ]]; then
     exit 1;
 fi
 
-# TODO: Add support for auto-selecting server and such.
 if [[ -z "${GOFILE_SERVER}" ]]; then
     echo "No Gofile server specified. Requesting new one";
     GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
@@ -75,6 +74,20 @@ if [[ -z "${GOFILE_SERVER}" ]]; then
     fi
 
     echo "Gofile server set to: ${GOFILE_SERVER}";
+fi
+
+# If no folder ID is specified, we either:
+# - Use the root folder
+# - Prompt the user to create one.
+# 
+# At the moment it will just default to use the root folder.
+# 
+# Eventually I'll add a flag or something to create a folder,
+# which allows for specifying a folder name, of course.
+if [[ -z "${FOLDER_ID}" ]]; then
+    ROOT_FOLDER_ID="$(curl -fsSL "https://api.gofile.io/getAccountDetails?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.rootFolder')";
+
+    FOLDER_ID="${ROOT_FOLDER_ID}";
 fi
 
 shift $((OPTIND - 1));
