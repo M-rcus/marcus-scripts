@@ -84,7 +84,7 @@ fi
 # 
 # Eventually I'll add a flag or something to create a folder,
 # which allows for specifying a folder name, of course.
-if [[ -z "${FOLDER_ID}" ]]; then
+if [[ -z "${FOLDER_ID}" ]]; then
     ROOT_FOLDER_ID="$(curl -fsSL "https://api.gofile.io/getAccountDetails?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.rootFolder')";
 
     FOLDER_ID="${ROOT_FOLDER_ID}";
