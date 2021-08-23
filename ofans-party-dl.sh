@@ -94,6 +94,10 @@ if [[ -z "${OFANS_IPFS_URL}" ]]; then
     OFANS_IPFS_URL="https://cloudflare-ipfs.com/ipfs";
 fi
 
+if [[ -z "${OFANS_API_BASE_URL}" ]]; then
+    OFANS_API_BASE_URL="https://api.ofans.party";
+fi
+
 # Shorter variable name
 IPFS="${OFANS_IPFS_URL}";
 
@@ -105,7 +109,7 @@ DL_DIR=$OUTPUT_DIR;
 for creator in $CREATORS;
 do
     echo "Fetching OnlyFans posts for creator: ${creator}";
-    CREATOR_URL="https://api.ofans.party/posts/${creator}";
+    CREATOR_URL="${OFANS_API_BASE_URL}/posts/${creator}";
     FETCH_CREATOR="$(curl --fail --silent -L "${CREATOR_URL}")";
 
     if [[ $? -ne 0 ]]; then
@@ -188,6 +192,12 @@ do
             fi
 
             IPFS_HASH="$(jq -r '.ipfs_media_hash' <<< "${MEDIA}")";
+
+            # No IPFS hash available, skip
+            if [[ "${IPFS_HASH}" == "null" ]]; then
+                continue;
+            fi
+
             FILE_NAME="${POST_ID}_${FILE_DATE}_${MEDIA_ID}${EXTENSION}";
 
             # Alright, I know this is ghetto, but I figured it was the easiest
