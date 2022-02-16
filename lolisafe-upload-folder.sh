@@ -12,6 +12,9 @@
 BASE_URL="${CYBERDROP_URL}";
 UPLOAD_FOLDER="$(realpath "$@")";
 
+# In case you need to send custom headers (e.g. something like the `-H "Authorization: Basic blahblah"` header) or other parameters to cURL
+CURL_PARAMS="${CYBERDROP_CURL_PARAMS}"
+
 if [[ ! -d "${UPLOAD_FOLDER}" ]]; then
     echo "Folder does not exist: ${UPLOAD_FOLDER}";
     exit 1;
@@ -30,7 +33,7 @@ ALBUM_JSON="$(echo "${ALBUM_JSON}" | jq --arg name "${ALBUM_NAME}" '.name = $nam
 echo "Creating album: ${ALBUM_NAME}";
 
 ALBUMS_URL="${BASE_URL}/api/albums";
-CREATE_ALBUM="$(curl -fssL -X POST -H "Content-Type: application/json" -H "token: ${TOKEN}" --data "${ALBUM_JSON}" "${ALBUMS_URL}")";
+CREATE_ALBUM="$(curl $CURL_PARAMS -fsSL -X POST -H "Content-Type: application/json" -H "token: ${TOKEN}" --data "${ALBUM_JSON}" "${ALBUMS_URL}")";
 
 ALBUM_ID="$(echo "${CREATE_ALBUM}" | jq -r '.id')";
 
@@ -52,7 +55,7 @@ IFS=$'\n';
 for file in $FILES;
 do
     file="$(basename -- "$file")";
-    POST_FILE="$(curl -fsSL -H "token: ${TOKEN}" -H "albumid: ${ALBUM_ID}" -F files[]=@\"${file}\" "${UPLOAD_FILE_URL}")"
+    POST_FILE="$(curl $CURL_PARAMS -fsSL -H "token: ${TOKEN}" -H "albumid: ${ALBUM_ID}" -F files[]=@\"${file}\" "${UPLOAD_FILE_URL}")"
     STATUS="$(echo "${POST_FILE}" | jq '.success')";
 
     if [[ "${STATUS}" == "false" ]]; then
@@ -73,7 +76,7 @@ if test -f "${ZIP_FILE}"; then
     echo "ZIP file detected. Attempting to upload: ${ZIP_FILE}";
 
     file="${ZIP_FILE}";
-    POST_FILE="$(curl -fsSL -H "token: ${TOKEN}" -H "albumid: ${ALBUM_ID}" -F files[]=@\"${file}\" "${UPLOAD_FILE_URL}")"
+    POST_FILE="$(curl $CURL_PARAMS -fsSL -H "token: ${TOKEN}" -H "albumid: ${ALBUM_ID}" -F files[]=@\"${file}\" "${UPLOAD_FILE_URL}")"
     STATUS="$(echo "${POST_FILE}" | jq '.success')";
 
     if [[ "${STATUS}" == "false" ]]; then
@@ -96,7 +99,7 @@ echo "Retrieving album list from API and attempting to extract album information
 # Generate a timestamp that should hopefully bypass the API cache, if any?
 DATE_TS="$(date +%s)";
 # Retrieve albums
-GET_ALBUMS="$(curl -fsSL -H "token: ${TOKEN}" "${ALBUMS_URL}?${DATE_TS}")";
+GET_ALBUMS="$(curl $CURL_PARAMS -fsSL -H "token: ${TOKEN}" "${ALBUMS_URL}?${DATE_TS}")";
 # Filter by ID
 ALBUM_INFO="$(echo "${GET_ALBUMS}" | jq --arg albumId "${ALBUM_ID}" '.albums[] | select(.id == ($albumId | tonumber))')";
 
