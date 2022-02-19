@@ -2,11 +2,9 @@
 
 # Requirements:
 # - `curl`
+# - `jq`
 # 
-# For Debian/Ubuntu: `apt install curl` (as root/sudo)
-# 
-# This script is _incredibly_ dumb, because it requires you to "create" an upload already, by uploading one file, before uploading your "main" file(s).
-# e.g. In the instances where I upload a small image first (via browser), copy the admin code and then use my server to upload the video (usually a few GBs).
+# For Debian/Ubuntu: `apt install curl jq` (as root/sudo)
 # 
 # REQUIRED:
 # Set the `GOFILE_ACCESS_TOKEN` environment variable.
@@ -94,3 +92,6 @@ shift $((OPTIND - 1));
 
 FILE_NAME="$@";
 curl --progress-bar -X POST -F folderId="${FOLDER_ID}" -F token="${GOFILE_ACCESS_TOKEN}" -F file="@${FILE_NAME}" "https://${GOFILE_SERVER}.gofile.io/uploadFile" | tee;
+
+# Just to add spacing
+echo;
