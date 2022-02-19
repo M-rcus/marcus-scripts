@@ -13,6 +13,9 @@
 #
 # If you clone the repository, you can still use symlinks to shortcut `gofile-folder-upload.sh` to for instance "gofile-folder".
 # A symlink will still resolve to the "marcus-scripts" directory and thus the "gofile-single-upload" script can easily be picked up.
+# 
+# OPTIONAL:
+# - Set the `GOFILE_PARENT_FOLDER` environment variable as the default parent ID. `-p` can still be used to override the environment variable.
 
 SCRIPT_DIR="$( cd "$( dirname $( realpath "${BASH_SOURCE}" ) )" &> /dev/null && pwd )";
 GOFILE_UPLOAD="${SCRIPT_DIR}/gofile-single-upload.sh";
@@ -36,7 +39,7 @@ if [[ -z "$@" ]]; then
     exit 0
 fi
 
-PARENT_FOLDER=""
+PARENT_FOLDER="${GOFILE_PARENT_FOLDER}";
 
 while getopts "hp:" opt; do
     case $opt in
@@ -45,6 +48,10 @@ while getopts "hp:" opt; do
             exit 0
             ;;
         p)
+            if [[ ! -z "${PARENT_FOLDER}" ]]; then
+                echo "Overriding parent folder ID from environment variable - Previous parent folder ID: ${GOFILE_PARENT_FOLDER}";
+            fi
+
             PARENT_FOLDER="${OPTARG}";
             echo "Parent folder ID specified: ${PARENT_FOLDER}";
             ;;
