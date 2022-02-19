@@ -30,7 +30,7 @@ ALBUM_JSON="$(echo "${ALBUM_JSON}" | jq --arg name "${ALBUM_NAME}" '.name = $nam
 echo "Creating album: ${ALBUM_NAME}";
 
 ALBUMS_URL="${BASE_URL}/api/albums";
-CREATE_ALBUM="$(curl -fssL -X POST -H "Content-Type: application/json" -H "token: ${TOKEN}" --data "${ALBUM_JSON}" "${ALBUMS_URL}")";
+CREATE_ALBUM="$(curl -fsSL -X POST -H "Content-Type: application/json" -H "token: ${TOKEN}" --data "${ALBUM_JSON}" "${ALBUMS_URL}")";
 
 ALBUM_ID="$(echo "${CREATE_ALBUM}" | jq -r '.id')";
 
