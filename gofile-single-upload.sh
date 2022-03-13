@@ -91,7 +91,7 @@ fi
 shift $((OPTIND - 1));
 
 FILE_NAME="$@";
-curl --progress-bar -X POST -F folderId="${FOLDER_ID}" -F token="${GOFILE_ACCESS_TOKEN}" -F file="@${FILE_NAME}" "https://${GOFILE_SERVER}.gofile.io/uploadFile" | tee;
+curl --progress-bar -X POST -F folderId="${FOLDER_ID}" -F token="${GOFILE_ACCESS_TOKEN}" -F "file=@\"${FILE_NAME}\"" "https://${GOFILE_SERVER}.gofile.io/uploadFile" | tee;
 
 # Just to add spacing
 echo;
