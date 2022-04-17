@@ -20,16 +20,8 @@ fi
 echo "Creating remote folder: ${MEGA_FOLDER}";
 megatools mkdir "${MEGA_FOLDER}";
 
-echo "Run copy command? [y/N]"
-read RUN_COPY
+echo "* Copying:"
+echo "Remote: ${MEGA_FOLDER}"
+echo "Local: ${FULL_PATH}"
 
-RUN_COPY=${RUN_COPY,,}
-if [[ $RUN_COPY == *"y"* ]]; then
-    echo "* Copying:"
-    echo "Remote: ${MEGA_FOLDER}"
-    echo "Local: ${FULL_PATH}"
-
-    megatools copy --remote "${MEGA_FOLDER}" --local "${FULL_PATH}";
-else
-    exit 0
-fi
+megatools copy --remote "${MEGA_FOLDER}" --local "${FULL_PATH}";
