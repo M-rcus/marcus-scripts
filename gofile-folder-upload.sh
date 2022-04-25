@@ -8,7 +8,7 @@
 # For Debian/Ubuntu: `apt install curl jq findutils` (as root/sudo)
 # 
 # REQUIRED:
-# - Set the `GOFILE_ACCESS_TOKEN` environment variable.
+# - Set the `GOFILE_ACCESS_TOKEN` environment variable, or specify \`-g\` for guest account
 # - Uses the `gofile-single-upload.sh` script in this repository. It's easiest if you just clone it. Alternatively, override the `$GOFILE_UPLOAD` variable below.
 #
 # If you clone the repository, you can still use symlinks to shortcut `gofile-folder-upload.sh` to for instance "gofile-folder".
@@ -19,6 +19,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname $( realpath "${BASH_SOURCE}" ) )" &> /dev/null && pwd )";
 GOFILE_UPLOAD="${SCRIPT_DIR}/gofile-single-upload.sh";
+GOFILE_GUEST_ACCOUNT="${SCRIPT_DIR}/gofile-guest-account.sh";
 
 usage()
 {
@@ -30,6 +31,7 @@ Uploads files from input folder to the created Gofile folder.
 
 OPTIONS:
     -p        Parent folder ID.
+    -g        Use guest account. Environment variable \`GOFILE_PARENT_FOLDER\` will be ignored if -g is specified.
 EOF
 }
 
@@ -41,7 +43,7 @@ fi
 
 PARENT_FOLDER="${GOFILE_PARENT_FOLDER}";
 
-while getopts "hp:" opt; do
+while getopts "hp:g" opt; do
     case $opt in
         h)
             usage
@@ -54,6 +56,13 @@ while getopts "hp:" opt; do
 
             PARENT_FOLDER="${OPTARG}";
             echo "Parent folder ID specified: ${PARENT_FOLDER}";
+            ;;
+        g)
+            GOFILE_ACCESS_TOKEN="$(eval "${GOFILE_GUEST_ACCOUNT}")";
+            # Parent folder will be automatically retrieved using guest account's token.
+            PARENT_FOLDER="";
+
+            echo "Using guest account - Token: ${GOFILE_ACCESS_TOKEN}";
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
