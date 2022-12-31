@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!node
 const clipboardy = require('clipboardy');
 
 /**
@@ -6,8 +6,12 @@ const clipboardy = require('clipboardy');
  */
 const regs = {
     bold: {
-        regex: /\[\/?B\]/g,
-        replace: '**',
+        regex: /\[B\]/g,
+        replace: '# ',
+    },
+    boldEnd: {
+        regex: /\[\/B\]/g,
+        replace: '',
     },
     strikethrough: {
         regex: /\[\/?S\]/g,
@@ -26,11 +30,15 @@ const regs = {
         replace: '```',
     },
     url: {
-        regex: /\[URL='(.*)'](.*)\[\/URL\]/g,
-        replace: '$2: <$1>',
+        regex: /\[URL='?(.*)'?](.*)\[\/URL\]/g,
+        replace: '[$2]($1)',
+    },
+    img: {
+        regex: /\[IMG\](.*)\[\/IMG\]/g,
+        replace: '![]($1)',
     },
     remove: {
-        regex: /\[\/?(B|LIST|COLOR|IMG|)(=rgb\([\d, ]+\))?\]/g,
+        regex: /\[\/?(B|LIST|COLOR|)(=rgb\([\d, ]+\))?\]/g,
         replace: '',
     },
 };
