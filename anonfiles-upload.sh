@@ -17,6 +17,8 @@ Uploads files to Anonfiles
 OPTIONS:
     -h        Show this message
     -s        Short format output: "\$FILENAME => \$URL". Short format will still display errors.
+    -b        Short format only: Wrap URL and filename into "list-format" BBCode, you know... for sharing.
+              Example: \`[*][URL='https://anonfiles.com/filename-blah.mp4']filename-blah.mp4[/URL]\`
 EOF
 }
 
@@ -27,8 +29,9 @@ if [[ -z "$@" ]]; then
 fi
 
 SHORT_FORMAT=0;
+BBCODE_FORMAT=0;
 
-while getopts "hs" opt; do
+while getopts "hsb" opt; do
     case $opt in
         h)
             usage
@@ -36,6 +39,9 @@ while getopts "hs" opt; do
             ;;
         s)
             SHORT_FORMAT=1;
+            ;;
+        b)
+            BBCODE_FORMAT=1;
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -86,7 +92,12 @@ FILESIZE="$(jq -r '.data.file.metadata.size.readable' <<< "${RESPONSE}")";
 FILE_URL="$(jq -r '.data.file.url.full' <<< "${RESPONSE}")";
 
 if [[ $SHORT_FORMAT == 1 ]]; then
-    echo "${FILE_NAME} => ${FILE_URL}";
+    if [[ $BBCODE_FORMAT == 1 ]]; then
+        echo "[*][URL='${FILE_URL}']${FILE_NAME}[/URL]";
+    else
+        echo "${FILE_NAME} => ${FILE_URL}";
+    fi
+    
     exit 0;
 fi
 
