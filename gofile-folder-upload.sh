@@ -110,7 +110,7 @@ FOLDER_ID="$(echo "${CREATED_FOLDER}" | jq -r .data.id)";
 FOLDER_CODE="$(echo "${CREATED_FOLDER}" | jq -r .data.code)";
 
 # Set folder to public
-FOLDER_UPDATE="$(curl -s -X PUT "https://api.gofile.io/setFolderOption" --data-raw "folderId=${FOLDER_ID}&token=${GOFILE_ACCESS_TOKEN}&option=public&value=true")";
+FOLDER_UPDATE="$(curl -s -X PUT "https://api.gofile.io/setOption" --data-raw "contentId=${FOLDER_ID}&token=${GOFILE_ACCESS_TOKEN}&option=public&value=true")";
 
 echo "Set Gofile folder ID ${FOLDER_ID} to be public";
 
