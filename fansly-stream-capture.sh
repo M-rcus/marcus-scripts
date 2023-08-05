@@ -21,6 +21,12 @@
 # If not set, it will default to the current working directory.
 # BASE_PATH="/home/marcus/media/fansly-livestreams"
 
+#################################################################################
+#################################################################################
+## Unless you know what you are doing, don't change anything below this block. ##
+#################################################################################
+#################################################################################
+
 if [[ -z "$FANSLY_TOKEN" ]]; then
     echo "Missing Fansly token (\`\$FANSLY_TOKEN\`)";
     exit 1;
@@ -46,6 +52,9 @@ if [[ -z "$1" ]]; then
     exit 1;
 fi
 
+# The username of the stream you're trying to capture. `${1}` means it gets defined when you run the script.
+# Example: `bash fansly-stream-capture.sh badbitch69420xd`
+# Would result in: `USERNAME="badbitch69420xd"`
 USERNAME="${1}";
 ACCOUNT_ID="$(request "https://apiv3.fansly.com/api/v1/account?usernames=${USERNAME}" | jq -r .response[0].id)";
 STREAM="$(request "https://apiv3.fansly.com/api/v1/streaming/channel/${ACCOUNT_ID}")";
