@@ -35,6 +35,10 @@ OPTIONS:
 EOF
 }
 
+newGofileServer() {
+    GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+}
+
 # Print usage when no parameters specified.
 if [[ -z "$@" ]]; then
     usage
@@ -122,12 +126,30 @@ FILES="$(find "." -maxdepth 1 -type f)";
 OIFS="$IFS";
 IFS=$'\n';
 INCREMENT=0;
+# TODO: Wrap this into a function at some point
 GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+LAST_UPLOAD=$(date +%s);
 for file in $FILES;
 do
     file="$(basename -- "$file")";
     $GOFILE_UPLOAD -f "${FOLDER_ID}" -s "${GOFILE_SERVER}" "${file}";
     INCREMENT=$((INCREMENT+1));
+    NOW=$(date +%s);
+
+    if [[ $LAST_UPLOAD -ne 0 ]]; then
+        LAST_UPLOAD_DIFF=$((NOW-LAST_UPLOAD));
+
+        # Check if previous upload was over a minute ago
+        # If it is, we assume that the file that was *just* uploaded is a big file
+        # So let's be nice and fetch a new Gofile server to "load balance"
+        # Probably doesn't matter much at Gofile's scale though
+        if [[ $LAST_UPLOAD_DIFF -gt 60 ]]; then
+            INCREMENT=0;
+            GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+        fi
+    fi
+
+    LAST_UPLOAD=$NOW;
 
     # To avoid too many rate limits when uploading a lot of files, we get a new Gofile server every 6 files.
     # Usually it's not necessary to get a new server, but let's help Gofile balance files out :)
