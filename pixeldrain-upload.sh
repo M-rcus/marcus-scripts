@@ -88,9 +88,9 @@ if [[ ! -z "${PIXELDRAIN_API_KEY}" ]]; then
 fi
 
 if [[ $SHORT_FORMAT == 1 || $ONLY_ID == 1 ]]; then
-    curl -s -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${FILE_NAME}" -o "${RESPONSE_FILE}";
+    curl -s -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${FILE_NAME/\#/%23}" -o "${RESPONSE_FILE}";
 else
-    curl --progress-bar -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${FILE_NAME}" -o "${RESPONSE_FILE}" | tee;
+    curl --progress-bar -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${FILE_NAME/\#/%23}" -o "${RESPONSE_FILE}" | tee;
 fi
 
 UPLOAD_EXITCODE=$?
