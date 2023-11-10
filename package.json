@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/M-rcus/marcus-scripts#readme",
   "dependencies": {
-    "axios": "^0.21.4",
+    "axios": "^1.6.0",
     "clipboardy": "^2.3.0",
     "meow": "^9.0.0",
     "signale": "^1.4.0"
