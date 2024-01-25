@@ -87,10 +87,16 @@ if [[ ! -z "${PIXELDRAIN_API_KEY}" ]]; then
     CURL_ARGS+=" -u :${PIXELDRAIN_API_KEY}";
 fi
 
+# "URL encoding". Aka replacing the most common issues I encounter with my filenames lol
+# If anyone is some form of Bash guru, feel free to PR with a better solution
+URL_FILE_NAME="${FILE_NAME}";
+URL_FILE_NAME="${URL_FILE_NAME/\#/%23}";
+URL_FILE_NAME="${URL_FILE_NAME/ /%20}";
+
 if [[ $SHORT_FORMAT == 1 || $ONLY_ID == 1 ]]; then
-    curl -s -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${FILE_NAME/\#/%23}" -o "${RESPONSE_FILE}";
+    curl -s -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${URL_FILE_NAME}" -o "${RESPONSE_FILE}";
 else
-    curl --progress-bar -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${FILE_NAME/\#/%23}" -o "${RESPONSE_FILE}" | tee;
+    curl --progress-bar -X PUT -T "${FILE_NAME}" $CURL_ARGS "https://pixeldrain.com/api/file/${URL_FILE_NAME}" -o "${RESPONSE_FILE}" | tee;
 fi
 
 UPLOAD_EXITCODE=$?
