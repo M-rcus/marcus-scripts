@@ -58,7 +58,7 @@ if [[ $VERBOSE == 1 ]]; then
 fi
 
 CURL_CMD="${CURL_CMD} -H 'User-Agent: ${USER_AGENT}'";
-CREATE_ACCOUNT=$(eval "${CURL_CMD} https://api.gofile.io/createAccount");
+CREATE_ACCOUNT=$(eval "${CURL_CMD} -X POST https://api.gofile.io/accounts");
 
 if [[ $VERBOSE == 1 ]]; then
     jq . <<< "${CREATE_ACCOUNT}";
