@@ -64,14 +64,16 @@ fi
 
 if [[ -z "${GOFILE_SERVER}" ]]; then
     echo "No Gofile server specified. Requesting new one";
-    GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+    GOFILE_SERVER_DETAILS="$(curl -fsSL "https://api.gofile.io/servers?zone=${GOFILE_ZONE}" | jq -r '.data.servers[0]')";
+    GOFILE_SERVER="$(echo "${GOFILE_SERVER_DETAILS}" | jq -r .name)";
+    GOFILE_ZONE="$(echo "${GOFILE_SERVER_DETAILS}" | jq -r .zone)";
 
-    if [[ -z "${GOFILE_SERVER}" ]]; then
+    if [[ -z "${GOFILE_SERVER}" || "${GOFILE_SERVER}" == "null" ]]; then
         echo "Unable to get Gofile server from API. Exiting.";
         exit 1;
     fi
 
-    echo "Gofile server set to: ${GOFILE_SERVER}";
+    echo "Gofile server set to: ${GOFILE_SERVER} | Zone: ${GOFILE_ZONE}";
 fi
 
 # If no folder ID is specified, we either:
@@ -83,7 +85,8 @@ fi
 # Eventually I'll add a flag or something to create a folder,
 # which allows for specifying a folder name, of course.
 if [[ -z "${FOLDER_ID}" ]]; then
-    ROOT_FOLDER_ID="$(curl -fsSL "https://api.gofile.io/getAccountDetails?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.rootFolder')";
+    ACCOUNT_ID="$(curl -fsSL "https://api.gofile.io/accounts/getid?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.id')";
+    ROOT_FOLDER_ID="$(curl -fsSL "https://api.gofile.io/accounts/${ACCOUNT_ID}?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.rootFolder')";
 
     FOLDER_ID="${ROOT_FOLDER_ID}";
 fi
@@ -91,7 +94,7 @@ fi
 shift $((OPTIND - 1));
 
 FILE_NAME="$@";
-curl --progress-bar -X POST -F folderId="${FOLDER_ID}" -F token="${GOFILE_ACCESS_TOKEN}" -F "file=@\"${FILE_NAME}\"" "https://${GOFILE_SERVER}.gofile.io/uploadFile" | tee;
+curl --progress-bar -X POST -F folderId="${FOLDER_ID}" -F token="${GOFILE_ACCESS_TOKEN}" -F "file=@\"${FILE_NAME}\"" "https://${GOFILE_SERVER}.gofile.io/contents/uploadfile" | tee;
 
 # Just to add spacing
 echo;

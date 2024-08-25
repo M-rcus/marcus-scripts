@@ -20,6 +20,7 @@
 SCRIPT_DIR="$( cd "$( dirname $( realpath "${BASH_SOURCE}" ) )" &> /dev/null && pwd )";
 GOFILE_UPLOAD="${SCRIPT_DIR}/gofile-single-upload.sh";
 GOFILE_GUEST_ACCOUNT="${SCRIPT_DIR}/gofile-guest-account.sh";
+GOFILE_ZONE="";
 
 usage()
 {
@@ -31,12 +32,21 @@ Uploads files from input folder to the created Gofile folder.
 
 OPTIONS:
     -p        Parent folder ID.
+
     -g        Use guest account. Environment variable \`GOFILE_PARENT_FOLDER\` will be ignored if -g is specified.
+              Requires the \`gofile-guest-account.sh\` script.
+
+    -z        What zone (geographical region) the Gofile server should reside in for upload.
+              At the time of writing, valid values are \`eu\` (Europe) or \`na\` (North America). Check the Gofile API documentation updated options: https://gofile.io/api
+              If not specified, all zones will be considered.
+              If an invalid zone is specified, the Gofile API will return servers from all zones.
 EOF
 }
 
 newGofileServer() {
-    GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+    # The sorting of the `.data.servers` array doesn't seem consistent, so picking the first server in the response is *probably* fine.
+    # Not sure if it's sorted by load or just random.
+    GOFILE_SERVER="$(curl -fsSL "https://api.gofile.io/servers?zone=${GOFILE_ZONE}" | jq -r '.data.servers[0].name')";
 }
 
 # Print usage when no parameters specified.
@@ -47,7 +57,7 @@ fi
 
 PARENT_FOLDER="${GOFILE_PARENT_FOLDER}";
 
-while getopts "hp:g" opt; do
+while getopts "hp:gz:" opt; do
     case $opt in
         h)
             usage
@@ -68,6 +78,10 @@ while getopts "hp:g" opt; do
 
             echo "Using guest account - Token: ${GOFILE_ACCESS_TOKEN}";
             ;;
+        z)
+            GOFILE_ZONE="${OPTARG}";
+            echo "Forcing Gofile zone: ${GOFILE_ZONE}";
+            ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
             exit 1
@@ -86,9 +100,16 @@ if [[ -z "${GOFILE_ACCESS_TOKEN}" ]]; then
     exit 1;
 fi
 
+
 # No parent folder ID specified, so we use the account's root folder.
 if [[ -z "${PARENT_FOLDER}" ]]; then
-    PARENT_FOLDER="$(curl -fsSL "https://api.gofile.io/getAccountDetails?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.rootFolder')";
+    # I really don't understand why this is even an endpoint that's necessary,
+    # but without knowing the account ID beforehand, we can't get account details... for whatever reason.
+    # In the past, Gofile simply gave us the account details based on the API token.
+    ACCOUNT_ID="$(curl -fsSL "https://api.gofile.io/accounts/getid?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.id')";
+
+    PARENT_FOLDER="$(curl -fsSL "https://api.gofile.io/accounts/${ACCOUNT_ID}?token=${GOFILE_ACCESS_TOKEN}" | jq -r '.data.rootFolder')";
+    echo "Parent folder set to root folder: ${PARENT_FOLDER}";
 fi
 
 UPLOAD_FOLDER="$(realpath "$@")";
@@ -98,7 +119,7 @@ if [[ ! -d "${UPLOAD_FOLDER}" ]]; then
 fi
 
 FOLDER_NAME="$(basename -- "${UPLOAD_FOLDER}")";
-CREATED_FOLDER="$(curl -s -X PUT "https://api.gofile.io/createFolder" --data-raw "parentFolderId=${PARENT_FOLDER}&token=${GOFILE_ACCESS_TOKEN}&folderName=${FOLDER_NAME}")";
+CREATED_FOLDER="$(curl -s -X POST "https://api.gofile.io/contents/createFolder" --data-raw "parentFolderId=${PARENT_FOLDER}&token=${GOFILE_ACCESS_TOKEN}&folderName=${FOLDER_NAME}")";
 
 STATUS="$(echo "${CREATED_FOLDER}" | jq -r .status)";
 
@@ -114,7 +135,7 @@ FOLDER_ID="$(echo "${CREATED_FOLDER}" | jq -r .data.id)";
 FOLDER_CODE="$(echo "${CREATED_FOLDER}" | jq -r .data.code)";
 
 # Set folder to public
-FOLDER_UPDATE="$(curl -s -X PUT "https://api.gofile.io/setOption" --data-raw "contentId=${FOLDER_ID}&token=${GOFILE_ACCESS_TOKEN}&option=public&value=true")";
+FOLDER_UPDATE="$(curl -s -X PUT "https://api.gofile.io/contents/${FOLDER_ID}/setOption" --data-raw "token=${GOFILE_ACCESS_TOKEN}&attribute=public&attributeValue=true")";
 
 echo "Set Gofile folder ID ${FOLDER_ID} to be public";
 
@@ -126,8 +147,9 @@ FILES="$(find "." -maxdepth 1 -type f)";
 OIFS="$IFS";
 IFS=$'\n';
 INCREMENT=0;
-# TODO: Wrap this into a function at some point
-GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+
+newGofileServer;
+
 LAST_UPLOAD=$(date +%s);
 for file in $FILES;
 do
@@ -145,7 +167,7 @@ do
         # Probably doesn't matter much at Gofile's scale though
         if [[ $LAST_UPLOAD_DIFF -gt 60 ]]; then
             INCREMENT=0;
-            GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+            newGofileServer;
         fi
     fi
 
@@ -155,7 +177,7 @@ do
     # Usually it's not necessary to get a new server, but let's help Gofile balance files out :)
     if [[ $INCREMENT -ge 6 ]]; then
         INCREMENT=0;
-        GOFILE_SERVER="$(curl -fsSL https://api.gofile.io/getServer | jq -r '.data.server')";
+        newGofileServer;
     fi
 done
 
